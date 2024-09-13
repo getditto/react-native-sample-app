@@ -67,9 +67,6 @@ const App = () => {
 
       ditto.current.sync.registerSubscription(`SELECT * FROM tasks`);
 
-      // Delete previous tasks
-      await ditto.current.store.execute(`EVICT FROM tasks`);
-
       // Subscribe to task updates
       ditto.current.store.registerObserver(`SELECT * FROM tasks`, response => {
         const fetchedTasks: Task[] = response.items.map(doc => {
