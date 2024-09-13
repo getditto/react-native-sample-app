@@ -1,3 +1,8 @@
+<div align="center" style="display: flex; justify-content: space-around; align-items: center;">
+  <img src="https://github.com/user-attachments/assets/7b0b1385-12d9-48d2-9005-deee70daa5f9" alt="Screenshot 1" style="width: 20%; margin-right: 120px;">
+  <img src="https://github.com/user-attachments/assets/e58a4713-437a-4e21-af39-be3dcc8da814" alt="Screenshot 2" style="width: 20%;">
+</div>
+
 # Ditto Task Sync App
 
 A sample React Native application that lets you create tasks and sync them with the Ditto Cloud via OnlinePlayground authentication. This example is built according to the [official Ditto installation guide for React Native](https://docs.ditto.live/install-guides/react-native).
