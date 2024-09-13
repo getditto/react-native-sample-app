@@ -36,10 +36,10 @@ const App = () => {
     ]);
 
     Object.entries(granted).forEach(([permission, result]) => {
-      if (result === PermissionsAndroid.RESULTS.GRANTED) {
-        console.log(`${permission} granted`);
-      } else {
-        console.log(`${permission} denied`);
+      if (result !== PermissionsAndroid.RESULTS.GRANTED) {
+        throw new Error(
+          `${permission} denied. You will need this permission to use Ditto P2P.`,
+        );
       }
     });
   }
@@ -69,13 +69,10 @@ const App = () => {
 
       // Subscribe to task updates
       ditto.current.store.registerObserver(`SELECT * FROM tasks`, response => {
-        const fetchedTasks: Task[] = response.items.map(doc => {
-          console.log(doc);
-          return {
-            id: doc.value._id,
-            title: doc.value.title as string,
-          };
-        });
+        const fetchedTasks: Task[] = response.items.map(doc => ({
+          id: doc.value._id,
+          title: doc.value.title as string,
+        }));
 
         setTasks(fetchedTasks);
       });
