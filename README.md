@@ -24,7 +24,7 @@ cd react-native-sample-app
 ### Install Dependencies
 
 ```bash
-npm install
+yarn install
 ```
 
 ### Configure App Credentials
