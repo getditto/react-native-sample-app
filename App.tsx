@@ -1,117 +1,161 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
-import React from 'react';
-import type {PropsWithChildren} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
+  FlatList,
   Text,
-  useColorScheme,
+  StyleSheet,
+  PermissionsAndroid,
+  Platform,
   View,
+  TextInput,
+  Button,
+  SafeAreaView,
 } from 'react-native';
-
 import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+  Ditto,
+  IdentityOnlinePlayground,
+  TransportConfig,
+} from '@dittolive/ditto';
 
-type SectionProps = PropsWithChildren<{
+type Task = {
+  id: string;
   title: string;
-}>;
+};
 
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
+const App = () => {
+  const [task, setTask] = useState<string>('');
+  const [tasks, setTasks] = useState<Task[]>([]);
+
+  const ditto = useRef<Ditto | null>(null);
+
+  async function requestPermissions() {
+    const granted = await PermissionsAndroid.requestMultiple([
+      PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
+      PermissionsAndroid.PERMISSIONS.BLUETOOTH_ADVERTISE,
+      PermissionsAndroid.PERMISSIONS.NEARBY_WIFI_DEVICES,
+      PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
+    ]);
+
+    Object.entries(granted).forEach(([permission, result]) => {
+      if (result === PermissionsAndroid.RESULTS.GRANTED) {
+        console.log(`${permission} granted`);
+      } else {
+        console.log(`${permission} denied`);
+      }
+    });
+  }
+
+  async function syncTasks() {
+    try {
+      const identity: IdentityOnlinePlayground = {
+        type: 'onlinePlayground',
+        appID: '<Your-App-ID>',
+        token: '<Your-Token>',
+      };
+
+      ditto.current = new Ditto(identity);
+      const transportsConfig = new TransportConfig();
+      transportsConfig.peerToPeer.bluetoothLE.isEnabled = true;
+      transportsConfig.peerToPeer.lan.isEnabled = true;
+      transportsConfig.peerToPeer.lan.isMdnsEnabled = true;
+
+      if (Platform.OS === 'ios') {
+        transportsConfig.peerToPeer.awdl.isEnabled = true;
+      }
+      ditto.current.setTransportConfig(transportsConfig);
+
+      ditto.current.startSync();
+
+      ditto.current.sync.registerSubscription(`SELECT * FROM tasks`);
+
+      // Delete previous tasks
+      await ditto.current.store.execute(`EVICT FROM tasks`);
+
+      // Subscribe to task updates
+      ditto.current.store.registerObserver(`SELECT * FROM tasks`, response => {
+        const fetchedTasks: Task[] = response.items.map(doc => {
+          console.log(doc);
+          return {
+            id: doc.value._id,
+            title: doc.value.title as string,
+          };
+        });
+
+        setTasks(fetchedTasks);
+      });
+    } catch (error) {
+      console.error('Error syncing tasks:', error);
+    }
+  }
+
+  useEffect(() => {
+    if (Platform.OS === 'android') {
+      requestPermissions();
+    }
+    syncTasks();
+  }, []);
+
+  async function handleAddTask() {
+    if (ditto.current === null) return;
+
+    if (task.trim().length === 0) return;
+
+    const result = await ditto.current.store.execute(
+      `INSERT INTO tasks DOCUMENTS ({ 'title': '${task}' })`,
+    );
+    const newId = result.mutatedDocumentIDs().map(id => id.value)[0];
+
+    const newTask: Task = {
+      title: task,
+      id: newId,
+    };
+    setTasks(currentTasks => [...currentTasks, newTask]);
+    setTask('');
+  }
+
+  const renderItem = ({item}: {item: Task}) => (
+    <View style={styles.item}>
+      <Text style={styles.title}>{item.title}</Text>
     </View>
   );
-}
-
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
+    <SafeAreaView style={styles.container}>
+      <TextInput
+        style={styles.input}
+        placeholder="Enter a task"
+        value={task}
+        onChangeText={setTask}
       />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
+      <Button title="Add Task" onPress={handleAddTask} />
+      <FlatList
+        data={tasks}
+        renderItem={renderItem}
+        keyExtractor={item => item.id}
+      />
     </SafeAreaView>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#fff',
   },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
+  input: {
+    marginBottom: 10,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
   },
-  sectionDescription: {
-    marginTop: 8,
+  item: {
+    padding: 10,
+    marginVertical: 8,
+    backgroundColor: '#f9c2ff',
+    borderRadius: 5,
+  },
+  title: {
     fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
   },
 });
 
