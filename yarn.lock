@@ -1579,6 +1579,34 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@deno/shim-deno-test@npm:^0.4.0":
+  version: 0.4.0
+  resolution: "@deno/shim-deno-test@npm:0.4.0"
+  checksum: 37397110e88f7f0f450f2e44a529ca1b240f5063783cc2e29b740ddd653ecca628a3764b935069569bd8a2830dad8ba1460351579a723e81e346eff420622708
+  languageName: node
+  linkType: hard
+
+"@deno/shim-deno@npm:~0.16.1":
+  version: 0.16.1
+  resolution: "@deno/shim-deno@npm:0.16.1"
+  dependencies:
+    "@deno/shim-deno-test": ^0.4.0
+    which: ^2.0.2
+  checksum: 35f08fd7a09e958128cee5a167f6a16b17fd36b0b973a6ac0fed0cea7314180ea4fbc464e82b27d5b70d5ebfbedba1a111c4f6c9bff8bfea52f22e85342d72c9
+  languageName: node
+  linkType: hard
+
+"@dittolive/ditto@npm:^4.8.1":
+  version: 4.8.1
+  resolution: "@dittolive/ditto@npm:4.8.1"
+  dependencies:
+    "@ungap/weakrefs": ^0.2.0
+    cbor-redux: ^1.0.0
+    fastestsmallesttextencoderdecoder: ^1.0.22
+  checksum: 47966e66cf7f2fd7ffaff924f6d19cacedce3af6257ed18e28fa48d42e5d2f66a9fd11d9264b58e8a238077fc6581230434c5a58be27e7876b3eb01d4e51c249
+  languageName: node
+  linkType: hard
+
 "@eslint-community/eslint-utils@npm:^4.2.0, @eslint-community/eslint-utils@npm:^4.4.0":
   version: 4.4.0
   resolution: "@eslint-community/eslint-utils@npm:4.4.0"
@@ -2875,6 +2903,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ungap/weakrefs@npm:^0.2.0":
+  version: 0.2.0
+  resolution: "@ungap/weakrefs@npm:0.2.0"
+  checksum: 37e4b08204198d87c1e8206d427d1d239e258cfca0bc405fe4da6f23474effc3654d09f4eb004ad3beaee61d92579002ee21e3e28e05125ab9e1684f6dcb7193
+  languageName: node
+  linkType: hard
+
 "DittoReactNativeSampleApp@workspace:.":
   version: 0.0.0-use.local
   resolution: "DittoReactNativeSampleApp@workspace:."
@@ -2882,6 +2917,7 @@ __metadata:
     "@babel/core": ^7.20.0
     "@babel/preset-env": ^7.20.0
     "@babel/runtime": ^7.20.0
+    "@dittolive/ditto": ^4.8.1
     "@react-native/babel-preset": 0.75.3
     "@react-native/eslint-config": 0.75.3
     "@react-native/metro-config": 0.75.3
@@ -3540,6 +3576,15 @@ __metadata:
   version: 1.0.30001660
   resolution: "caniuse-lite@npm:1.0.30001660"
   checksum: 8b2c5de2f5facd31980426afbba68238270984acfe8c1ae925b8b6480448eea2fae292f815674617e9170c730c8a238d7cc0db919f184dc0e3cd9bec18f5e5ad
+  languageName: node
+  linkType: hard
+
+"cbor-redux@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "cbor-redux@npm:1.0.0"
+  dependencies:
+    "@deno/shim-deno": ~0.16.1
+  checksum: 5fac2cc916f3352995ab9a215dc23c26f51e396da4c38ddab2de1a6068cf7602ab2646b24ccabf1bc6f9022fd9b26af3b27939e9747bbf715a9e4d252c191617
   languageName: node
   linkType: hard
 
@@ -4722,6 +4767,13 @@ __metadata:
   bin:
     fxparser: src/cli/cli.js
   checksum: 696dc98da46f0f48eb26dfe1640a53043ea64f2420056374e62abbb5e620f092f8df3c3ff3195505a2eefab2057db3bf0ebaac63557f277934f6cce4e7da027c
+  languageName: node
+  linkType: hard
+
+"fastestsmallesttextencoderdecoder@npm:^1.0.22":
+  version: 1.0.22
+  resolution: "fastestsmallesttextencoderdecoder@npm:1.0.22"
+  checksum: cc5e6c3b4c13de41a24e1311af4d0726e85d9edd75af8a13282f9e5f2751805d869455352a0bf065ab59c9c240d078b7abd98d676da9257666402e56ce9395d0
   languageName: node
   linkType: hard
 
@@ -9307,7 +9359,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"which@npm:^2.0.1":
+"which@npm:^2.0.1, which@npm:^2.0.2":
   version: 2.0.2
   resolution: "which@npm:2.0.2"
   dependencies:

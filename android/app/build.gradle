@@ -105,11 +105,19 @@ android {
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }
+     packagingOptions {
+        pickFirst 'lib/x86/libjsi.so'
+        pickFirst 'lib/x86_64/libjsi.so'
+        pickFirst 'lib/armeabi-v7a/libjsi.so'
+        pickFirst 'lib/arm64-v8a/libjsi.so'
+    }
 }
 
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
+
+    implementation "live.ditto:ditto:4.8.1"
 
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")
