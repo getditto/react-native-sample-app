@@ -9,6 +9,7 @@ import {
   TextInput,
   Button,
   SafeAreaView,
+  Alert,
 } from 'react-native';
 import {
   Ditto,
@@ -28,20 +29,17 @@ const App = () => {
   const ditto = useRef<Ditto | null>(null);
 
   async function requestPermissions() {
-    const granted = await PermissionsAndroid.requestMultiple([
+    const permissions = [
       PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
       PermissionsAndroid.PERMISSIONS.BLUETOOTH_ADVERTISE,
       PermissionsAndroid.PERMISSIONS.NEARBY_WIFI_DEVICES,
       PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
-    ]);
+    ];
 
-    Object.entries(granted).forEach(([permission, result]) => {
-      if (result !== PermissionsAndroid.RESULTS.GRANTED) {
-        throw new Error(
-          `${permission} denied. You will need this permission to use Ditto P2P.`,
-        );
-      }
-    });
+    const granted = await PermissionsAndroid.requestMultiple(permissions);
+    return Object.values(granted).every(
+      result => result === PermissionsAndroid.RESULTS.GRANTED,
+    );
   }
 
   async function syncTasks() {
@@ -82,10 +80,19 @@ const App = () => {
   }
 
   useEffect(() => {
-    if (Platform.OS === 'android') {
-      requestPermissions();
-    }
-    syncTasks();
+    const setupDitto = async () => {
+      const granted =
+        Platform.OS === 'android' ? await requestPermissions() : true;
+      if (granted) {
+        syncTasks();
+      } else {
+        Alert.alert(
+          'Permission Denied',
+          'You need to grant all permissions to use this app.',
+        );
+      }
+    };
+    setupDitto();
   }, []);
 
   async function handleAddTask() {
