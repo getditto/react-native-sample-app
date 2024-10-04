@@ -106,6 +106,12 @@ android {
         }
     }
      packagingOptions {
+         jniLibs {
+             useLegacyPackaging = true
+             keepDebugSymbols.add("**/libdittoffi.so")
+             keepDebugSymbols.add("**/libcpp.so")
+         }
+
         pickFirst 'lib/x86/libjsi.so'
         pickFirst 'lib/x86_64/libjsi.so'
         pickFirst 'lib/armeabi-v7a/libjsi.so'
